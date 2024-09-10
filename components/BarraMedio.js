@@ -1,10 +1,11 @@
 import { StyleSheet, Text, View, Dimensions, StatusBar, Image, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import React, { useState, useEffect } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 export default function BarraMedio() {
   const [data, setData] = useState([]);
   const [query, setQuery] = useState('Naruto');
-
+  const navigation = useNavigation();
 
   const obtenerDatos = () => {
     const URL = `https://kitsu.io/api/edge/anime?filter[text]=${query}`;
@@ -16,30 +17,33 @@ export default function BarraMedio() {
       .catch(err => console.log(err));
   };
 
-
   useEffect(() => {
     obtenerDatos();
   }, []);
 
-
   const renderItem = ({ item }) => (
     <View style={styles.item}>
-      <Image
-        source={{ uri: item.attributes.posterImage.original }}
-        style={styles.image}
-      />
+      <TouchableOpacity onPress={() => navigation.navigate('AnimeData', {
+        uri: item.attributes.posterImage.original,
+        canonicalTitle: item.attributes.canonicalTitle, 
+        synopsis: item.attributes.synopsis,
+        showType: item.attributes.showType,
+        episodeCount: item.attributes.episodeCount,
+        episodeLength: item.attributes.episodeLength,
+        startDate: item.attributes.startDate,
+        endDate: item.attributes.endDate,
+        ageRating: item.attributes.ageRating,
+        ageRatingGuide: item.attributes.ageRatingGuide,
+        averageRating: item.attributes.averageRating,
+        status: item.attributes.status,
+        popularityRank: item.attributes.popularityRank
+        })}>
+        <Image
+          source={{ uri: item.attributes.posterImage.original }}
+          style={styles.image}
+        />
+      </TouchableOpacity>
       <Text style={styles.title}>{item.attributes.canonicalTitle}</Text>
-      <Text style={styles.description}>{item.attributes.synopsis}</Text>
-      <Text style={styles.text}>Tipo: {item.attributes.showType}</Text>
-      <Text style={styles.text}>Episodios: {item.attributes.episodeCount || 'N/A'}</Text>
-      <Text style={styles.text}>Duración: {item.attributes.episodeLength ? `${item.attributes.episodeLength} min` : 'N/A'}</Text>
-      <Text style={styles.text}>Inicio: {item.attributes.startDate}</Text>
-      <Text style={styles.text}>Final: {item.attributes.endDate || 'En emisión'}</Text>
-      <Text style={styles.text}>Clasificación: {item.attributes.ageRating}</Text>
-      <Text style={styles.text}>Guía de clasificación: {item.attributes.ageRatingGuide}</Text>
-      <Text style={styles.text}>Puntuación: {item.attributes.averageRating}</Text>
-      <Text style={styles.text}>Estado: {item.attributes.status}</Text>
-      <Text style={styles.text}>Popularidad: #{item.attributes.popularityRank}</Text>
     </View>
   );
 
@@ -101,7 +105,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   flatListContainer: {
-    paddingBottom: 20, // Espacio adicional al final de la lista
+    paddingBottom: 20,
   },
   item: {
     marginBottom: 20,
